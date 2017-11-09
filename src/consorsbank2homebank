@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+"""
+consorsbank2homebank
+
+A script to convert CSV files exported from the german bank's
+consorsbank online banking (https://consorsbank.de) to a format
+understood by finance software Homebank
+(http://homebank.free.fr/help/misc-csvformat.html).
+
+Version: 1
+Author: Sven Festersen <sven@sven-festersen.de>
+License: GPL3
+"""
+import argparse
+from datetime import datetime
+import os
+import sys
+import tempfile
+
+import pandas
+
+# == parse command line options
+description = "Convert consorsbank CSV files to Homebank CSV format."
+parser = argparse.ArgumentParser(description=description)
+parser.add_argument("input", type=str, help="input filename")
+parser.add_argument("output", type=str, help="output filename")
+parser.add_argument("--archive", type=str, help="archive filename",
+                    default="")
+parser.add_argument("--payment",
+                    help="payment type for all transactions",
+                    type=int, choices=list(range(11)), default=0)
+parser.add_argument("--category", help="category for all transactions",
+                    type=str, default="")
+parser.add_argument("--tag", help="tag for all transactions",
+                    type=str, action="append")
+
+args = parser.parse_args()
+
+# == check files
+fn = os.path.abspath(args.input)
+fn_out = os.path.abspath(args.output)
+
+if not os.path.exists(fn):
+    exit("Input file not found: {0}".format(args.input))
+    
+if os.path.exists(fn_out):
+    exit("Output file exists: {0}".format(args.output))
+
+# == load raw data
+raw = pandas.read_csv(os.path.abspath(fn), sep=";", encoding="utf8")
+export = pandas.DataFrame()
+
+# == perform conversion
+# format date
+r_date = raw["Valuta"]
+t_date = [datetime.strptime(x, "%d.%m.%Y") for x in r_date]
+d_date = [x.strftime("%d-%m-%y") for x in t_date]
+export["date"] = d_date
+# payment
+d_payment = [args.payment for x in d_date]
+export["payment"] = d_payment
+# info
+d_info = raw["Buchungstext"]
+export["info"] = d_info
+# payee
+d_payee = raw["Sender / Empfänger"]
+export["payee"] = d_payee
+# memo
+d_memo = raw["Verwendungszweck"]
+export["memo"] = d_memo
+# amount
+d_amount = [x.replace(".", "") for x in raw["Betrag in EUR"]]
+export["amount"] = d_amount
+# category
+export["category"] = [args.category for x in d_date]
+# tags
+tags = "" if args.tag is None else " ".join(args.tag)
+export["tags"] = [tags for x in d_date]
+
+# == check against archive if necessary
+if args.archive != "":
+    # save temporary export file
+    h, fn_temp = tempfile.mkstemp()
+    os.close(h)
+    export.to_csv(fn_temp, sep=";", index=False,
+                  encoding="utf8")
+    # re-read export from temp file
+    export = pandas.read_csv(fn_temp, sep=";", encoding="utf8")
+    os.remove(fn_temp)
+    
+    fn_arch = os.path.abspath(args.archive)
+    if not os.path.exists(fn_arch):
+        with open(fn_arch, "w") as f:
+            f.write("date;payment;info;payee;memo;amount;category;tags\n")
+    arch = pandas.read_csv(fn_arch, sep=";", encoding="utf8")
+    merged = arch.merge(export, how="outer", indicator=True)
+    diff = merged[merged["_merge"] == "right_only"]
+    if len(diff) == 0:
+        exit("No new transactions found.")
+    delta = len(export) - len(diff)
+    print("{0} duplicate transactions discarded.".format(delta))
+    # update export
+    export = diff
+    # update archive
+    del diff["_merge"]
+    new_arch = diff.append(arch)
+    new_arch.to_csv(fn_arch, sep=";", index=False, encoding="utf8")
+    print("{0} transactions added to archive.".format(len(diff)))
+
+# == save in Homebank format
+export.to_csv(os.path.abspath(fn_out), sep=";", index=False,
+              encoding="utf8")
+print("{0} transactions saved to output file.".format(len(export)))
