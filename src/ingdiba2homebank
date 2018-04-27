@@ -46,7 +46,7 @@ if os.path.exists(fn_out):
     exit("Output file exists: {0}".format(args.output))
 
 # == load raw data
-raw = pandas.read_csv(os.path.abspath(fn), sep=";", header=4,
+raw = pandas.read_csv(os.path.abspath(fn), sep=";", header=9,
                       encoding="latin1")
 export = pandas.DataFrame()
 
