@@ -50,7 +50,6 @@ if os.path.exists(fn_out):
 raw = pandas.read_csv(os.path.abspath(fn), sep=";", header=10,
                       encoding="latin1")
 export = pandas.DataFrame()
-print(raw.columns)
 
 # == perform conversion
 # format date
