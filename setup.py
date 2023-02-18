@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 
 setup(name="x2homebank",
-      version="1",
-      author="Sven Festersen",
+      version="2.0.0",
+      author="Sven Rusch",
+      author_email="sven@sven-rusch.de",
       description=" Scripts to convert transaction CSV files from online banking portals to Homebank format.",
-      requires=["pandas"],
-      scripts=["src/consorsbank2homebank", "src/ingdiba2homebank"],
-     )
+      packages=find_packages(where="src"),
+      package_dir={"": "src"},
+      entry_points={"console_scripts": [
+            "x2homebank = x2homebank.cli.homebank:main",
+            "consorsbank2homebank = x2homebank.cli.consorsbank:main",
+            "ing2homebank = x2homebank.cli.ing:main",
+      ]},
+      install_requires=["click"]
+      )
