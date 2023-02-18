@@ -13,7 +13,7 @@ Currently, only two German banks are supported:
 | ING         | https://ing.de           | ing2homebank         |
 
 ## Usage
-The `x2homebank` package provides tree command line tools: `x2homebank` for
+The `x2homebank` package provides three command line tools: `x2homebank` for
 processing files in Homebank format, `consorsbank2homebank` for files in
 Consorsbank format and `ing2homebank` for files downloaded from ING.
 
@@ -23,7 +23,7 @@ the transactions it finds in that file, e.g.
     ing2homebank show /path/to/ing.csv
 
 The `consorsbank2homebank` and `ing2homebank` tools support the additional
-command `convert` that read the content of the input CSV file and writes it
+command `convert` that reads the content of the input CSV file and writes it
 to a CSV file in Homebank format, e.g.
 
     ing2homebank convert /path/to/ing.csv /path/to/export.csv
@@ -31,7 +31,7 @@ to a CSV file in Homebank format, e.g.
 Note that the export file is overwritten if it already exists.
 
 ## Installation
-To install the x2homebank scripts, run
+To install the x2homebank package and command line tools, run
 
     python setup.py install
   
