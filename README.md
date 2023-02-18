@@ -1,40 +1,40 @@
 # x2homebank
-This repository provides Python scripts to convert transaction CSV files obtained from German online banking portals to a
-format that's suitable for import into Homebank (http://homebank.free.fr/help/misc-csvformat.html).
+This repository provides a Python package to display and convert transaction
+CSV files obtained from German online banking portals to a format that's
+suitable for import into Homebank
+(http://homebank.free.fr/help/misc-csvformat.html).
 
 ## Supported Banks
 Currently, only two German banks are supported:
 
-| Bank        | Website                | Script               |
-| ----------- | ---------------------- | -------------------- |
-| Consorsbank | https://consorsbank.de | consorsbank2homebank |
-| ING-DiBa    | https://ing-diba.de    | ingdiba2homebank     |
+| Bank        | Website                  | Script               |
+|-------------|--------------------------|----------------------|
+| Consorsbank | https://consorsbank.de   | consorsbank2homebank |
+| ING         | https://ing.de           | ing2homebank         |
 
 ## Usage
-The repository contains one script per bank. To perform a simple conversion, run
+The `x2homebank` package provides three command line tools: `x2homebank` for
+processing files in Homebank format, `consorsbank2homebank` for files in
+Consorsbank format and `ing2homebank` for files downloaded from ING.
 
-    ingdiba2homebank download.csv out.csv
-    
-This will convert a CSV file "download.csv" downloaded from the ING-DiBa online banking website to a file "out.csv".
-Conversion will fail if the output file already exists, i.e. existing data is not overwritten.
+All three tools support the command `show` that reads a CSV file and displays
+the transactions it finds in that file, e.g.
 
-The Homebank payment type is set to 0 ("none") by default. To apply a different payment type, e.g. 4 ("transfer") to
-all transactions, use the `--payment` parameter:
+    ing2homebank show /path/to/ing.csv
 
-    ingdiba2homebank download.csv out.csv --payment 4
-    
-Similarly, it is possible to assign the same category to all transactions using the `--category` parameter:
+The `consorsbank2homebank` and `ing2homebank` tools support the additional
+command `convert` that reads the content of the input CSV file and writes it
+to a CSV file in Homebank format, e.g.
 
-    ingdiba2homebank download.csv out.csv --category Expenses
-    
-By default, no category is set. One or more tags can be assigned to all transactions with the `--tag` parameter:
+    ing2homebank convert /path/to/ing.csv /path/to/export.csv
 
-    ingdiba2homebank download.csv out.csv --tag tag1 --tag tag2 --tag tag3
+Note that the export file is overwritten if it already exists.
 
 ## Installation
-To install the x2homebank scripts, run
+To install the x2homebank package and command line tools, run
 
     python setup.py install
   
-with root privileges. Pandas (http://pandas.pydata.org/) is required to install and use the scripts.
-The installation script will install the scripts globally, so they are available to all users.
+with root privileges. The only dependency is *click*
+(see https://click.palletsprojects.com/), which is installed automatically by
+the setup script.
