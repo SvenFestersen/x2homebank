@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime
 from typing import TextIO
 
@@ -9,21 +10,22 @@ from ..transaction_list import TransactionList
 class ConsorsbankImporter(TransactionImporter):
     """Import transactions from CSV files in Consorsbank format."""
 
-    ignore_header_lines = 1
+    ignore_header_lines = 4
 
     def read(self, f: TextIO) -> TransactionList:
+        reader = csv.reader(f)
+    
         self.skipped_lines = []
         date_reader = lambda x: datetime.strptime(x, "%d.%m.%Y")
         transactions = TransactionList()
 
         line_no = 0
 
-        for line in f:
+        for values in reader:
             line_no += 1
             if line_no <= self.ignore_header_lines:
                 continue
 
-            values = tuple(x.strip() for x in line.strip().split(";"))
             skip_line = False
 
             # parse date
