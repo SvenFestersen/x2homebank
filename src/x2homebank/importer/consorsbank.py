@@ -7,13 +7,26 @@ from ..transaction import Transaction, PaymentType
 from ..transaction_list import TransactionList
 
 
+class ConsorsbankDialect(csv.Dialect):
+
+    delimiter = ";"
+    doublequote = True
+    escapechar = "\\"
+    lineterminator = "\n"
+    quotechar = '"'
+    quoting = csv.QUOTE_MINIMAL
+    skipinitialspace = False
+    strict = True
+
+
+
 class ConsorsbankImporter(TransactionImporter):
     """Import transactions from CSV files in Consorsbank format."""
 
     ignore_header_lines = 4
 
     def read(self, f: TextIO) -> TransactionList:
-        reader = csv.reader(f)
+        reader = csv.reader(f, dialect=ConsorsbankDialect())
     
         self.skipped_lines = []
         date_reader = lambda x: datetime.strptime(x, "%d.%m.%Y")
