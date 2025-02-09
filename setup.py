@@ -14,6 +14,7 @@ setup(name="x2homebank",
             "x2homebank = x2homebank.cli.homebank:main",
             "consorsbank2homebank = x2homebank.cli.consorsbank:main",
             "ing2homebank = x2homebank.cli.ing:main",
+            "comdirect2homebank = x2homebank.cli.comdirect:main",
       ]},
       install_requires=["click"]
       )
