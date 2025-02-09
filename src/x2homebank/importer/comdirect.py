@@ -24,8 +24,7 @@ class ComdirectImporter(TransactionImporter):
 
     encoding = "latin1"
     ignore_header_lines = 5
-    #text_regex = re.compile(r"^(?:Auftraggeber\:|Empfänger\:) (.*?)Buchungstext: (.*?) Ref. (.*?)$")
-    text_regex = re.compile(r"^(?:(?:Auftraggeber\:|Empfänger\:) (.*?))? (?:Buchungstext: (.*?))? Ref. (.*?)$")
+    text_regex = re.compile(r"^(?:(?:Auftraggeber\:|Empfänger\:) (.*?))?(?:Kto.*?)? (?:Buchungstext: (.*?))? Ref. (.*?)$")
 
     def read(self, f: TextIO) -> TransactionList:
         date_reader = lambda x: datetime.strptime(x, "%d.%m.%Y")
