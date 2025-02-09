@@ -8,7 +8,6 @@ from ..transaction_list import TransactionList
 
 
 class ConsorsbankDialect(csv.Dialect):
-
     delimiter = ";"
     doublequote = True
     escapechar = "\\"
@@ -19,48 +18,41 @@ class ConsorsbankDialect(csv.Dialect):
     strict = True
 
 
-
 class ConsorsbankImporter(TransactionImporter):
     """Import transactions from CSV files in Consorsbank format."""
 
     ignore_header_lines = 4
 
     def read(self, f: TextIO) -> TransactionList:
-        reader = csv.reader(f, dialect=ConsorsbankDialect())
-    
-        self.skipped_lines = []
         date_reader = lambda x: datetime.strptime(x, "%d.%m.%Y")
         transactions = TransactionList()
+        reader = csv.reader(f, dialect=ConsorsbankDialect())
 
         line_no = 0
 
-        for values in reader:
+        for row in reader:
             line_no += 1
             if line_no <= self.ignore_header_lines:
                 continue
 
             skip_line = False
-
             # parse date
             try:
-                t_date = date_reader(values[1]).date()
+                t_date = date_reader(row[1]).date()
             except ValueError:
                 skip_line = True
 
             t_payment = PaymentType.NONE
-
             # parse amount
             try:
-                t_amount = float(values[10].replace(".", "").replace(",", "."))
+                t_amount = float(row[10].replace(".", "").replace(",", "."))
             except ValueError:
                 skip_line = True
 
             if not skip_line:
-                transaction = Transaction(t_date, t_payment, values[5],
-                                          values[2], values[6], t_amount,
-                                          "", [])
+                transaction = Transaction(t_date, t_payment, row[5], row[2], row[6], t_amount, "", [])
                 transactions.add(transaction)
             else:
                 self.skipped_lines.append(line_no)
-
         return transactions
+
