@@ -64,7 +64,7 @@ class ComdirectImporter(TransactionImporter):
                 self.skipped_lines.append(line_no)
                 continue
             payee = m.group(1) if m.group(1) is not None else ""
-            memo = (m.group(2) if m.group(2) is not None else "") + "; Referenz: " + m.group(3)
+            memo = (m.group(2) if m.group(2) is not None else "") + " - Referenz: " + m.group(3)
 
 
             if not skip_line:
