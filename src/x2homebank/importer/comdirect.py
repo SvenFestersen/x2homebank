@@ -67,7 +67,7 @@ class ComdirectImporter(TransactionImporter):
 
 
             if not skip_line:
-                transaction = Transaction(t_date, t_payment, "", payee, memo, t_amount, "", [])
+                transaction = Transaction(t_date, t_payment, row[2], payee, memo, t_amount, "", [])
                 transactions.add(transaction)
             else:
                 self.skipped_lines.append(line_no)
