@@ -21,7 +21,7 @@ class ConsorsbankDialect(csv.Dialect):
 class ConsorsbankImporter(TransactionImporter):
     """Import transactions from CSV files in Consorsbank format."""
 
-    ignore_header_lines = 4
+    ignore_header_lines = 6
 
     def read(self, f: TextIO) -> TransactionList:
         date_reader = lambda x: datetime.strptime(x, "%d.%m.%Y")
